@@ -1,0 +1,44 @@
+library(tidyverse)
+library(caTools)
+library(shiny)
+
+insurance <- read_csv('insurance.csv')
+
+insurance$sex <- as.factor(insurance$sex)
+insurance$smoker <- as.factor(insurance$smoker)
+insurance$region <- as.factor(insurance$region)
+
+#EDA
+
+ggplot(insurance, aes(region, charges)) + geom_boxplot()
+ggplot(insurance, aes(smoker, charges)) + geom_boxplot()
+ggplot(insurance, aes(sex, charges)) + geom_boxplot()
+ggplot(insurance, aes(bmi, charges)) + geom_point() + geom_smooth(method='lm')
+ggplot(insurance, aes(as.factor(children), charges)) + geom_boxplot()
+ggplot(insurance, aes(age, charges)) + geom_point() + geom_smooth(method='lm')
+
+#Model Fitting
+set.seed(101)
+
+train.control <- trainControl(method='repeatedcv', number=10, repeats=3)
+
+#Shiny
+ui <- fluidPage(
+  tabsetPanel(
+    tabPanel('Dataset', dataTableOutput('table')),
+    tabPanel('Plots', sidebarLayout(
+      sidebarPanel('xvar', 'Select variable',selectInput(colnames(insurance[1:6]))),
+      mainPanel(plotOutput('plot'))
+    )
+    )
+  )
+)
+  
+
+
+server <- function(input, output){
+  output$table <- renderDataTable(insurance)
+  output$plot <- renderPlot(ggplot(insurance, aes(age, charges)) + geom_point())
+}
+
+shinyApp(ui, server)
