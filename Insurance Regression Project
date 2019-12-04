@@ -1,4 +1,4 @@
-'''r
+```r
 library(tidyverse)
 library(caTools)
 library(shiny)
@@ -43,4 +43,4 @@ server <- function(input, output){
 }
 
 shinyApp(ui, server)
-'''
+```
